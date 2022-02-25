@@ -1,0 +1,74 @@
+Created by : Lukman Nul Hakim - 2020
+
+
+//Input Differential
+syms a b x y t s X Y A B
+A=(str2sym('diff(x(t),t)=4*x(t) - y(t)'));
+pretty(A)
+B=(str2sym('diff(y(t),t)=2*x(t) + y(t)'));
+pretty(B)
+
+//Laplace Differential
+A=laplace(A,s);
+A=subs(A,{str2sym('laplace(x(t), t, s)'),str2sym('laplace(y(t), t, s)'),str2sym('x(0)')},{X,Y,x});
+a=isolate(A,x);
+a=collect(a,X);
+a=subs(a,{x},{1})
+B=laplace(B,s);
+B=subs(B,{str2sym('laplace(x(t), t, s)'),str2sym('laplace(y(t), t, s)'),str2sym('y(0)')},{X,Y,y});
+b=isolate(B,y);
+b=collect(b,Y);
+b=subs(b,{y},{3})
+
+//Solving Simultaneous Differential
+a = [1, 1; 3, s-1] / [s-4, 1; -2, s-1];
+x=det(a);
+pretty(x)
+b= [s-4, 1; -2, 3] / [s-4, 1; -2, s-1];
+y=det(b);
+pretty(y)
+
+//Inverse Laplace
+x=ilaplace(x);
+pretty(x)
+y=ilaplace(y);
+pretty(y)
+
+//Proving the solution
+x=subs(x,{str2sym('t')},{0})
+y=subs(y,{str2sym('t')},{0})
+
+
+// EXAMPLE //
+
+syms a b c d x y t s X Y A B
+A=(str2sym('2*diff(x(t),t)+diff(y(t),t)+ x(t)+5*y(t)=4*t'));
+pretty(A) %INPUT PERSAMAAN DIFFERENSIAL ke-1
+B=(str2sym('diff(x(t),t)+diff(y(t),t)+2*x(t)+2*y(t)= 2'));
+pretty(B) %INPUT PERSAMAAN DIFFERENSIAL ke-2
+
+A=laplace(A,s); B=laplace(B,s);
+A=subs(A,{str2sym('laplace(x(t), t, s)'),str2sym('laplace(y(t), t, s)'),str2sym('x(0)'),str2sym('y(0)')},{X,Y,x,y});
+B=subs(B,{str2sym('laplace(x(t), t, s)'),str2sym('laplace(y(t), t, s)'),str2sym('x(0)'),str2sym('y(0)')},{X,Y,x,y});
+A=subs(A,{str2sym('- y - 2*x'),str2sym('4/s^2')},{0,str2sym('4/s^2+ y + 2*x')}); A=subs(A,{x,y},{3,-4}); A=simplifyFraction(A); A=collect(A,Y);A=collect(A,X);
+B=subs(B,{str2sym('- y - x'),str2sym('2/s')},{0,str2sym('2/s+y+x')}); B=subs(B,{x,y},{3,-4});B=simplifyFraction(B); B=collect(B,Y);B=collect(B,X);
+pretty(A) %Substitusi x(0) dan y(0) pada Pers.Differential ke-1 yang telah di-Laplace
+pretty(B) %Substitusi x(0) dan y(0) pada Pers.Differential ke-2 yang telah di-Laplace
+ 
+%format pd simultan x(t), a = [k1, b1; k2, b2] / [a1,b1; a2, b2]; 
+%format pd simultan y(t), a = [a1, k1; a2, k2] / [a1,b1; a2, b2]; 
+
+a = [(2*(s^2 + 2))/s^2,(s + 5);-(s - 2)/s, (s + 2)] / [(2*s + 1),(s + 5);(s + 2), (s + 2)];
+x=det(a); 
+pretty(x) %Penyelesaian Pers.Differential Simultan untuk x(t)
+b= [(2*s + 1), (2*(s^2 + 2))/s^2;(s + 2),-(s - 2)/s] / [(2*s + 1),(s + 5);(s + 2), (s + 2)];
+y=det(b); 
+pretty(y) %Penyelesaian Pers.Differential Simultan untuk y(t)
+
+x=ilaplace(x);
+pretty(x) %Inverse Laplace untuk x(t)
+y=ilaplace(y);
+pretty(y) %Inverse Laplace untuk y(t)
+
+x=subs(x,{str2sym('t')},{0}) %Pembuktian x(0)
+y=subs(y,{str2sym('t')},{0}) %Pembuktian y(0)
